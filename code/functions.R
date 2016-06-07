@@ -62,6 +62,7 @@ get_peak_age <- function(roi, get_best_model, df, motion_estimate = NULL, ...) {
   # If the best-fitting model is first-order linear, then just output a sentinel value ...
   if (best_model == 1) {
     peak_age <- -999
+    return(peak_age)
   # ... otherwise construct the appropriate model formula
   } else
     best_fmla <- fmlas[[best_model]]
