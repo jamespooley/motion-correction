@@ -11,23 +11,19 @@ construct_fmla <- function(roi, degree, motion_estimate = NULL) {
 }
 
 
-# get_aic_val <- function(fit_summary) {
-#   aic_val <- 
-#   aic_val
-# }
-
-
-compare_models <- function(fit_summaries) {
+compare_models <- function(model_fits) {
   
   # TODO: Compare with base null model?
+  
+  aic_vals <- map(model_fits, extractAIC)
   
   age_coefs <- list("poly(age, degree = 1, raw = TRUE)", 
                     "poly(age, degree = 2, raw = TRUE)2",
                     "poly(age, degree = 3, raw = TRUE)3")
-  
+  fit_summaries <- map(model_fits, summary)
   p_vals <- map2(fit_summaries, age_coefs, summary)
   
-  aic_values <- AIC(fit_summaries[[1]], fit_summaries[[2]], fit_summaries[[3]])
+
 
   if (p3 < .05 & aic_values$AIC[3] < aic_values$AIC[2] & aic_values$AIC[3] < aic_values$AIC[1]) {
     model_order <- 3
@@ -42,11 +38,11 @@ compare_models <- function(fit_summaries) {
 
 get_best_model <- function(model_fits) {
   
-  fit_summaries <- map(model_fits, summary)
+  # fit_summaries <- map(model_fits, summary)
+  # 
+  # model_comparison <- AIC(model_fits[[1]], model_fits[[2]], model_fits[[3]])  # TODO: Is there a way to unpack the fits list?
   
-  model_comparison <- AIC(model_fits[[1]], model_fits[[2]], model_fits[[3]])  # TODO: Is there a way to unpack the fits list?
-  
-  best_model <- compare_models(fit_summaries)
+  best_model <- compare_models(model_fits)
   best_model
 }
 
