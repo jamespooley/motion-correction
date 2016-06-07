@@ -1,5 +1,4 @@
 library(purrr)
-# library(dplyr)
 
 
 construct_fmla <- function(roi, degree, motion_estimate = NULL) {
@@ -22,8 +21,6 @@ compare_models <- function(model_fits) {
                     "poly(age, degree = 3, raw = TRUE)3")
   fit_summaries <- map(model_fits, summary)
   p_vals <- map2(fit_summaries, age_coefs, summary)
-  
-
 
   if (p3 < .05 & aic_values$AIC[3] < aic_values$AIC[2] & aic_values$AIC[3] < aic_values$AIC[1]) {
     model_order <- 3
@@ -36,23 +33,21 @@ compare_models <- function(model_fits) {
 }
 
 
+# TODO: This is kind of pointless; combine with get_peak_age function?
 get_best_model <- function(model_fits) {
-  
-  # fit_summaries <- map(model_fits, summary)
-  # 
-  # model_comparison <- AIC(model_fits[[1]], model_fits[[2]], model_fits[[3]])  # TODO: Is there a way to unpack the fits list?
-  
   best_model <- compare_models(model_fits)
   best_model
 }
 
 
 # Helper function to get the age of peak cortical thickness for a single ROI
+# TODO: Still a lot of duplication going on here
 get_peak_age <- function(roi, get_best_model, df, motion_estimate = NULL, ...) {
   
   # Construct the model formulas
   degrees <- list(1, 2, 3)
   fmlas <- map2(list(roi, roi, roi), degrees, construct_fmla)  # TODO; Remove ROI duplication
+  # fmlas <- map(degrees, construct_fmla, roi)
   
   model_fits <- map(fmlas, function(fmla) lm(fmla, data = df))
 
@@ -70,6 +65,7 @@ get_peak_age <- function(roi, get_best_model, df, motion_estimate = NULL, ...) {
   # Fit the appropriate model
   best_fit <- lm(best_fmla, data = df)
   
+  # TODO: Wrap this in function
   age_range <- range(df$age)
   age <- seq(age_range[1], age_range[2], by = 0.01)
   n_ages <- length(age)
@@ -82,22 +78,11 @@ get_peak_age <- function(roi, get_best_model, df, motion_estimate = NULL, ...) {
                        diagnosis = diagnosis,
                        site = site)
   
+  #new_df <- construct_df(age, sex, diagnosis, site)
+  
   best_model_preds <- predict(best_fit, new_df)
   
   peak_age_idx <- which.max(best_model_preds)
   peak_age <- new_df$ages[peak_age_idx]
   peak_age
 }
-
-
-#-------------------------------------------------------------------------
-# TODO: Put all this in its own script
-#
-# peak_ages_no_motion <- map(roi_list, get_peak_age)
-# 
-# roi_list <- names(pardoe_df)[16:80]
-# 
-# best_models_no_motion <- map(roi_list, get_best_model)
-# 
-# peak_ages_no_motion <- map(roi_list, get_peak_ages)
-# peak_ages_motion_rmsd <- map(roi_list, get_peak_ages, "rmsd")
