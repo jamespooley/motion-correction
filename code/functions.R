@@ -11,7 +11,7 @@ construct_fmla <- function(roi, degree, motion_estimate = NULL) {
 
 
 # TODO: Compare with null model
-get_best <- function(p_vals, aic_vals) {
+get_order <- function(p_vals, aic_vals) {
   
   # TODO: Is there a function to unpack a list like in Python?
   p1 <- p_vals[[1]]
