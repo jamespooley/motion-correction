@@ -36,7 +36,8 @@ get_order <- function(p_vals, aic_vals) {
 compare_models <- function(model_fits) {
   # TODO: Compare with base null model?
   
-  aic_vals <- map(model_fits, extractAIC)  # TODO: Check that this is a list of three numbers
+  # TODO: More transparent way to do this?
+  aic_vals <- map(model_fits, extractAIC) %>% map_dbl(2) %>% as.list
   
   age_coefs <- list("poly(age, degree = 1, raw = TRUE)", 
                     "poly(age, degree = 2, raw = TRUE)2",
