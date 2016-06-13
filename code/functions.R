@@ -77,8 +77,9 @@ get_peak_age <- function(roi, df, motion_estimate = NULL) {
 
   # Get the model that best fits the data for the ROI
   best_model <- get_best_model(model_fits)
+  best_model
   
-  # TODO: All this is a bit crap, so find a better way 
+  # TODO: All this is a bit crap, so find a better way
   # If the best-fitting model is first-order linear, then just output a sentinel value ...
   if (best_model == 1) {
     peak_age <- -999
@@ -86,28 +87,33 @@ get_peak_age <- function(roi, df, motion_estimate = NULL) {
   # ... otherwise construct the appropriate model formula
   } else
     best_fmla <- fmlas[[best_model]]
+  print(best_fmla)
   
-  # Fit the appropriate model
-  best_fit <- lm(best_fmla, data = df)
+  pred_df <- modelr::add_predictions(predictions = lm(best_fmla, 
+                                                      data = tidyr::expand(df, age)))
   
-  # TODO: Wrap this in function
-  age_range <- range(df$age)
-  age <- seq(age_range[1], age_range[2], by = 0.01)
-  n_ages <- length(age)
-  sex <- rep(sex, length = n_ages)
-  site <- rep(site, length = n_ages)
-  diagnosis <- rep(diagnosis, length = n_ages)
+  # # Fit the appropriate model
+  # best_fit <- lm(best_fmla, data = df)
+  # 
+  # # TODO: Wrap this in function
+  # age_range <- range(df$age)
+  # age <- seq(age_range[1], age_range[2], by = 0.01)
+  # n_ages <- length(age)
+  # sex <- rep(df$sex[1], length = n_ages)
+  # site <- rep(df$site[1], length = n_ages)
+  # diagnosis <- rep(df$diagnosis[1], length = n_ages)
+  # 
+  # new_df <- data.frame(age = age,
+  #                      sex = sex,
+  #                      diagnosis = diagnosis,
+  #                      site = site)
+  # 
+  # # Something like this: new_df <- construct_df(age, sex, diagnosis, site)?
+  # 
+  # best_model_preds <- predict(best_fit, new_df)
+  # 
+  # peak_age_idx <- which.max(best_model_preds)
   
-  new_df <- data.frame(age = age,
-                       sex = sex,
-                       diagnosis = diagnosis,
-                       site = site)
-  
-  # Something like this: new_df <- construct_df(age, sex, diagnosis, site)?
-  
-  best_model_preds <- predict(best_fit, new_df)
-  
-  peak_age_idx <- which.max(best_model_preds)
-  peak_age <- new_df$ages[peak_age_idx]
+  peak_age <- pred_df$ages[peak_age_idx]
   peak_age
 }
