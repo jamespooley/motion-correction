@@ -15,7 +15,7 @@ construct_fmla <- function(roi, degree, motion_estimate = NULL) {
 
 # Helper function to get the p-value of the regression coefficient estimate
 get_p_value <- function(fit_summary, nm) {
-  p <- fit_summary$coefficients[nm, 4]
+  p <- fit_summary$coefficients[nm, "Pr(>|t|)"]
   p
 }
 
@@ -79,15 +79,16 @@ get_peak_age <- function(roi, df, motion_estimate = NULL) {
   best_model <- get_best_model(model_fits)
   best_model
   
-  # TODO: All this is a bit crap, so find a better way
-  # If the best-fitting model is first-order linear, then just output a sentinel value ...
-  if (best_model == 1) {
-    peak_age <- -999
-    return(peak_age)
-  # ... otherwise construct the appropriate model formula
-  } else
-    best_fmla <- fmlas[[best_model]]
-  # print(best_fmla)
+  # # TODO: All this is a bit crap, so find a better way
+  # # If the best-fitting model is first-order linear, then just output a sentinel value ...
+  # if (best_model == 1) {
+  #   peak_age <- -999
+  #   return(peak_age)
+  # # ... otherwise construct the appropriate model formula
+  # } else
+  #   best_fmla <- fmlas[[best_model]]
+  # # print(best_fmla)
+  best_fmla <- fmlas[[best_model]]
   
   # pred_df <- modelr::add_predictions(predictions = lm(best_fmla, 
   #                                                     data = tidyr::expand(df, age)))
@@ -114,5 +115,10 @@ get_peak_age <- function(roi, df, motion_estimate = NULL) {
   preds_df <- modelr::add_predictions(preds_df, preds = best_fit)
   peak_age_idx <- which.max(preds_df$preds)
   peak_age <- preds_df$age[peak_age_idx]
-  peak_age
+  
+  # Return sentinel value when best fitting model is first-order linear
+  if (best_model == 1) {
+    return(-999)
+  } else
+    peak_age
 }
