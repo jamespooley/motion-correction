@@ -87,13 +87,13 @@ get_peak_age <- function(roi, df, motion_estimate = NULL) {
   # ... otherwise construct the appropriate model formula
   } else
     best_fmla <- fmlas[[best_model]]
-  print(best_fmla)
+  # print(best_fmla)
   
-  pred_df <- modelr::add_predictions(predictions = lm(best_fmla, 
-                                                      data = tidyr::expand(df, age)))
+  # pred_df <- modelr::add_predictions(predictions = lm(best_fmla, 
+  #                                                     data = tidyr::expand(df, age)))
   
-  # # Fit the appropriate model
-  # best_fit <- lm(best_fmla, data = df)
+  # Fit the appropriate model
+  best_fit <- lm(best_fmla, data = df)
   # 
   # # TODO: Wrap this in function
   # age_range <- range(df$age)
@@ -109,11 +109,10 @@ get_peak_age <- function(roi, df, motion_estimate = NULL) {
   #                      site = site)
   # 
   # # Something like this: new_df <- construct_df(age, sex, diagnosis, site)?
-  # 
-  # best_model_preds <- predict(best_fit, new_df)
-  # 
-  # peak_age_idx <- which.max(best_model_preds)
-  
-  peak_age <- pred_df$ages[peak_age_idx]
+
+  preds_df <- as.data.frame(tidyr::expand(df, age))
+  preds_df <- modelr::add_predictions(preds_df, preds = best_fit)
+  peak_age_idx <- which.max(preds_df$preds)
+  peak_age <- preds_df$age[peak_age_idx]
   peak_age
 }
