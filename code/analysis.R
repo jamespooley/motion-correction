@@ -30,7 +30,23 @@ peak_ages_males <- data_frame(
                             dplyr::filter(analysis_df, sex == "male", diagnosis == "adhd"), "mean.rms")
 )
 
-no_motion <- map_dbl(roi_list, get_peak_age, subset(analysis_df, diagnosis == "adhd"))
-motion <- map_dbl(roi_list, get_peak_age, subset(analysis_df, diagnosis == "adhd"), "qi1")
+get_results <- function(sx, dx) {
+  results <- data_frame(
+    no_motion = map_dbl(roi_list, get_peak_age, dplyr::filter(analysis_df, sex == sx, diagnosis == dx)),
+    motion_qi1 = map_dbl(roi_list, get_peak_age, dplyr::filter(analysis_df, sex == sx, diagnosis == dx), "Qi1"),
+    motion_snr = map_dbl(roi_list, get_peak_age,
+                         dplyr::filter(analysis_df, sex == sx, diagnosis == dx), "SNR"),
+    motion_qap.mean.rms = map_dbl(roi_list, get_peak_age,
+                                  dplyr::filter(analysis_df, sex == sx, diagnosis == dx), "qap.mean.rms"),
+    motion_mean.rms = map_dbl(roi_list, get_peak_age,
+                              dplyr::filter(analysis_df, sex == sx, diagnosis == dx), "mean.rms")
+  )
+  results
+}
+
+pam <- get_results("male", "adhd")
+
+# no_motion <- map_dbl(roi_list, get_peak_age, subset(analysis_df, diagnosis == "adhd"))
+# motion <- map_dbl(roi_list, get_peak_age, subset(analysis_df, diagnosis == "adhd"), "qi1")
 
 sum(no_motion != motion)
