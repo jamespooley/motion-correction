@@ -87,8 +87,6 @@ get_peak_age <- function(roi, df, motion_estimate = NULL) {
   # Otherwise construct the appropriate model formula
   } else
     best_fmla <- fmlas[[best_model]]
-  # # print(best_fmla)
-  # best_fmla <- fmlas[[best_model]]
   
   # pred_df <- modelr::add_predictions(predictions = lm(best_fmla, 
   #                                                     data = tidyr::expand(df, age)))
