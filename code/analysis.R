@@ -3,7 +3,7 @@ library(dplyr)
 library(purrr)
 library(ggplot2)
 
-source("code/functions.R")
+source("code/helper_functions.R")
 
 qap_measures <- c("EFC", "FWHM", "Qi1", "SNR", "FBER", "CNR")
 roi_names <- names(pardoe_df)[16:80]
@@ -32,8 +32,10 @@ peak_ages_males <- data_frame(
 
 get_results <- function(sx, dx) {
   results <- data_frame(
-    no_motion = map_dbl(roi_list, get_peak_age, dplyr::filter(analysis_df, sex == sx, diagnosis == dx)),
-    motion_qi1 = map_dbl(roi_list, get_peak_age, dplyr::filter(analysis_df, sex == sx, diagnosis == dx), "Qi1"),
+    no_motion = map_dbl(roi_list, get_peak_age, 
+                        dplyr::filter(analysis_df, sex == sx, diagnosis == dx)),
+    motion_qi1 = map_dbl(roi_list, get_peak_age, 
+                         dplyr::filter(analysis_df, sex == sx, diagnosis == dx), "Qi1"),
     motion_snr = map_dbl(roi_list, get_peak_age,
                          dplyr::filter(analysis_df, sex == sx, diagnosis == dx), "SNR"),
     motion_qap.mean.rms = map_dbl(roi_list, get_peak_age,
@@ -44,7 +46,9 @@ get_results <- function(sx, dx) {
   results
 }
 
-pam <- get_results("male", "adhd")
+peaks_male <- get_results("male", "adhd")
+peaks_female <- get_results("female", "adhd")
+
 
 # no_motion <- map_dbl(roi_list, get_peak_age, subset(analysis_df, diagnosis == "adhd"))
 # motion <- map_dbl(roi_list, get_peak_age, subset(analysis_df, diagnosis == "adhd"), "qi1")
