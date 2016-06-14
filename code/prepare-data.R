@@ -5,14 +5,19 @@ library(dplyr)
 ##############################################################################
 # ORGANIZE THE VARIOUS DATASETS ##############################################
 ##############################################################################
-#
+
 # TODO: Wrap all the code to organize the datasets into a function
+
 
 # Load the Pardoe et al. data
 pardoe_file <- "data/pardoe.motion.morphometry.20160416.csv"
 pardoe_df <- read.csv(pardoe_file) %>% 
   filter(study == "adhd")
 pardoe_df <- pardoe_df %>% tbl_df
+
+qap_measures <- c("EFC", "FWHM", "Qi1", "SNR", "FBER", "CNR")
+roi_names <- names(pardoe_df)[16:80]
+roi_list <- as.list(roi_names)
 
 func_temp_df <- read_csv("data/qap_ADHD200_functional_temporal.csv") %>% 
   rename(id = Participant,
